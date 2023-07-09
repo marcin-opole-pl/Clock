@@ -6,14 +6,21 @@ import numpy as np
 import random
 import re
 import customtkinter as ctk
+from style import *
 
+# Set theme
+th = 1
 
 # Initialize root
-root = tk.Tk()
+root = ctk.CTk()
 # Prevent resize
 root.resizable(False, False)
 # Title root
 root.title("Analog Clock Master")
+# Set window's theme
+ctk.set_default_color_theme("green")
+# Set deafult GUI style
+ctk.set_appearance_mode('Light')
 
 # Set dimentions for canvas to be square
 # For horizontal screen
@@ -25,16 +32,12 @@ elif root.winfo_screenwidth() < root.winfo_screenheight():
     WIDTH = root.winfo_screenwidth() - root.winfo_screenwidth() / 10
     HEIGHT = WIDTH
 # Set root size to screen size
-root.geometry(f'{root.winfo_screenwidth()}x{root.winfo_screenheight()}')
-
+root.geometry(f'{root.winfo_screenwidth()}x{root.winfo_screenheight()}+0+0')
 # Set canvas
-canvas = tk.Canvas(
+canvas = ctk.CTkCanvas(
     root, 
     width=WIDTH, 
     height=HEIGHT, 
-    bg="white", 
-    borderwidth='5', 
-    relief='groove'
     )
 canvas.grid(
     column=0, 
@@ -44,8 +47,7 @@ canvas.grid(
     padx=(WIDTH/50, 0), 
     rowspan=12
     )
-# Set deafult GUI style
-#ctk.set_appearance_mode('Light')
+
 
 # Declare variables to store user's input
 in_hour = tk.StringVar()
@@ -66,7 +68,6 @@ minute_box = ttk.Entry()
 second_box = ttk.Entry()
 
 def main():
-    styles()
     draw_clock_face()
     start()
     menu()
@@ -74,15 +75,20 @@ def main():
     draw_second_hand()
     draw_minute_hand()
     draw_hour_hand()
+    print(f'{hour} : {minute} : {second}')
     users_input()
     draw_check()
-    #layout_help()
+    layout_help()
     
 
 
 def draw_clock_face():
     # Draw clock face
-    canvas.create_oval(20, 20, WIDTH-10, HEIGHT-10, outline="black", width=8)
+    canvas.create_oval(
+        20, 20,
+        WIDTH-10, HEIGHT-10,
+        outline=themes[th]['clock_outline'],
+        width=themes[th]['clock_outline_width'])
     # Draw central point
     canvas.create_oval(WIDTH/2-8, HEIGHT/2-8, WIDTH/2+8, HEIGHT/2+8, fill='black')
  
@@ -176,10 +182,10 @@ def draw_second_hand():
 
 
 def start():
-    start = ttk.Button(
+    start = ctk.CTkButton(
         root,
         text='Start',
-        style='A.TButton',
+        font=(font[1]),
         command=start_func
     )
     start.grid(
@@ -192,10 +198,11 @@ def start():
 
 
 def menu():
-    menu = ttk.Button(
+    menu = ctk.CTkButton(
         root,
         text='Menu',
-        style='A.TButton', 
+        font=(font[1])
+
     )
     menu.grid(
         column=3, 
@@ -207,10 +214,10 @@ def menu():
 
 
 def quit():
-    quit = ttk.Button(
+    quit = ctk.CTkButton(
         root,
         text='Quit',
-        style='A.TButton', 
+        font=(font[1])
     )
     quit.grid(
         column=5, 
@@ -224,10 +231,10 @@ def quit():
 def users_input():
     global hour_box, minute_box, second_box
     ttk.Separator(root, orient='horizontal').grid(column=1, row=1, columnspan=6, sticky=tk.EW)
-    label = ttk.Label(
+    label = ctk.CTkLabel(
         root,
         text='What time is it?',
-        font=('Helvetica, 30'),
+        font=(font[3]),
         anchor=tk.CENTER
     )
     label.grid(
@@ -237,10 +244,10 @@ def users_input():
         sticky=tk.EW,
         padx=50
     )
-    hour = ttk.Label(
+    hour = ctk.CTkLabel(
         root,
         text='Hour',
-        style='A.TLabel',
+        font=(font[2]),
         anchor=tk.CENTER
     )
     hour.grid(
@@ -249,10 +256,10 @@ def users_input():
         sticky=tk.EW,
         padx=(50, 5)
     )
-    minute = ttk.Label(
+    minute = ctk.CTkLabel(
         root,
         text='Minute',
-        style='A.TLabel',
+        font=(font[2]),
         anchor=tk.CENTER
     )
     minute.grid(
@@ -261,10 +268,10 @@ def users_input():
         sticky=tk.EW,
         padx=5
     )
-    second = ttk.Label(
+    second = ctk.CTkLabel(
         root,
         text='Second',
-        style='A.TLabel',
+        font=(font[2]),
         anchor=tk.CENTER
     )
     second.grid(
@@ -273,11 +280,11 @@ def users_input():
         sticky=tk.EW,
         padx=5
     )
-    hour_box = ttk.Entry(
+    hour_box = ctk.CTkEntry(
         root,
-        font=('Helvetica, 40'),
+        font=(font[3]),
         justify='center',
-        width=3,
+        width=100,
         textvariable=in_hour        
     )
     hour_box.focus()
@@ -286,21 +293,21 @@ def users_input():
         row=3,
         padx=(50, 5)
     )
-    label_1 = ttk.Label(
+    label_1 = ctk.CTkLabel(
         root,
         text=':',
-        font=('Helvetica, 40'),
+        font=(font[3]),
         justify='center',
     )
     label_1.grid(
         column=2,
         row=3,
     )
-    minute_box = ttk.Entry(
+    minute_box = ctk.CTkEntry(
         root,
-        font=('Helvetica, 40'),
+        font=(font[3]),
         justify='center',
-        width=3,
+        width=100,
         textvariable=in_minute        
     )
     minute_box.grid(
@@ -308,21 +315,21 @@ def users_input():
         row=3,
         padx=5
     )
-    label_2 = ttk.Label(
+    label_2 = ctk.CTkLabel(
         root,
         text=':',
-        font=('Helvetica, 40'),
+        font=(font[3]),
         justify='center',
     )
     label_2.grid(
         column=4,
         row=3,
     )
-    second_box = ttk.Entry(
+    second_box = ctk.CTkEntry(
         root,
-        font=('Helvetica, 40'),
+        font=(font[3]),
         justify='center',
-        width=3,
+        width=100,
         textvariable=in_second        
     )
     second_box.grid(
@@ -330,10 +337,10 @@ def users_input():
         row=3,
         padx=5
     )
-    submit = ttk.Button(
+    submit = ctk.CTkButton(
         root,
         text='Check your answer',
-        style='A.TButton',
+        font=(font[4]),
         command=check_func 
     )
     submit.grid(
@@ -390,22 +397,18 @@ def layout_help():
     ttk.Label(background='red').grid(column=4, row=ROW, sticky=tk.EW)
     ttk.Label(background='blue').grid(column=5, row=ROW, sticky=tk.EW)
     ttk.Label(background='red').grid(column=6, row=ROW, sticky=tk.EW)
-
-
-def styles():
-    style = ttk.Style()
-    style.configure(
-        'A.TButton', 
-        relief='groove',
-        borderwidth=10,
-        font=('Helvetica, 20')
-    )
-    style.configure(
-        'A.TLabel',
-        relief='groove',
-        borderwidth=10,
-        font=('Helvetica, 20')
-    )
+    ttk.Label(background='yellow').grid(column=6, row=0, sticky=tk.EW)
+    ttk.Label(background='green').grid(column=6, row=1, sticky=tk.EW)
+    ttk.Label(background='yellow').grid(column=6, row=2, sticky=tk.EW)
+    ttk.Label(background='green').grid(column=6, row=3, sticky=tk.EW)
+    ttk.Label(background='yellow').grid(column=6, row=4, sticky=tk.EW)
+    ttk.Label(background='green').grid(column=6, row=5, sticky=tk.EW)
+    ttk.Label(background='yellow').grid(column=6, row=6, sticky=tk.EW)
+    ttk.Label(background='green').grid(column=6, row=7, sticky=tk.EW)
+    ttk.Label(background='yellow').grid(column=6, row=8, sticky=tk.EW)
+    ttk.Label(background='green').grid(column=6, row=9, sticky=tk.EW)
+    ttk.Label(background='yellow').grid(column=6, row=10, sticky=tk.EW)
+    ttk.Label(background='green').grid(column=6, row=11, sticky=tk.EW)
 
 
 def start_func():
@@ -415,7 +418,6 @@ def start_func():
     
 
 def check_func():
-    print(f'{hour} : {minute} : {second}')
     global check_answ, STATE
     user_hour = in_hour.get()
     user_min = in_minute.get()
@@ -423,41 +425,38 @@ def check_func():
     match_h = re.fullmatch(r'(^[0]?[0-9]?|[1]?[0-2]?$)', user_hour)
     match_m = re.fullmatch(r'(^[0]?[0-9]?|[1-5]?[0-9]?$)', user_min)
     match_s = re.fullmatch(r'(^[0]?[0-9]?|[1-5]?[0-9]?$)', user_sec)
-    # Check corecness of input format
-    if match_h and match_m and match_s:
-        if int(user_hour) == hour and int(user_min) == minute and int(user_sec) == second:
-            check_answ = 'Correct answer'
-            STATE = 1
-            clear_entry_boxes()
+    # Check corectness of input format
+    try:
+        if match_h and match_m and match_s:
+            if int(user_hour) == hour and int(user_min) == minute and int(user_sec) == second:
+                check_answ = 'Correct answer'
+                STATE = 1
+                clear_entry_boxes()
+            else:
+                check_answ = 'Wrong answer'
         else:
-            check_answ = 'Wrong answer'
-    else:
+            check_answ = 'Wrong input format'
+    except:
         check_answ = 'Wrong input format'
 
 
 def draw_check():
     # Set canvas for check reply
-    reply = tk.Canvas(
-        root, 
-        width=WIDTH/20, 
-        height=HEIGHT/100, 
-        bg="white", 
-        borderwidth='5', 
-        relief='flat'
+    reply = ctk.CTkLabel(
+        root,
+        text='',
+        font=(font[2]),
+        fg_color='yellow' 
         )
     reply.grid(
-        column=1, 
+        column=2, 
         row=6,
-        columnspan=6, 
+        columnspan=4, 
         sticky=tk.NSEW, 
         pady=HEIGHT/30, 
         padx=(WIDTH/50, 0)
     )
-    reply.delete('all')
-    # Print text
-    reply.create_text(200, 40, text=check_answ, font=("Helvetica", 24))
-    reply.after(500, draw_check)
-  
+    reply.configure(text=check_answ)
 
 if __name__ == '__main__':
     main()
