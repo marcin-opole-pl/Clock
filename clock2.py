@@ -37,7 +37,7 @@ root.geometry(f'{root.winfo_screenwidth()}x{root.winfo_screenheight()}+0+0')
 canvas = ctk.CTkCanvas(
     root, 
     width=WIDTH, 
-    height=HEIGHT, 
+    height=HEIGHT
     )
 canvas.grid(
     column=0, 
