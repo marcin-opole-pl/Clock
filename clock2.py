@@ -18,9 +18,9 @@ root.resizable(False, False)
 # Title root
 root.title("Analog Clock Master")
 # Set window's theme
-ctk.set_default_color_theme("green")
-# Set deafult GUI style
-ctk.set_appearance_mode('Light')
+ctk.set_default_color_theme("dark-blue")
+# Mask window icon
+root.iconbitmap('empty.ico')
 
 # Set dimentions for canvas to be square
 # For horizontal screen
@@ -37,7 +37,8 @@ root.geometry(f'{root.winfo_screenwidth()}x{root.winfo_screenheight()}+0+0')
 canvas = ctk.CTkCanvas(
     root, 
     width=WIDTH, 
-    height=HEIGHT
+    height=HEIGHT,
+    background='#325882'
     )
 canvas.grid(
     column=0, 
@@ -62,12 +63,13 @@ s_list = []
 hour = 0
 minute = 0
 second = 0
-check_answ = ''
 hour_box = ttk.Entry()
 minute_box = ttk.Entry()
 second_box = ttk.Entry()
 
 def main():
+    # Bind enter key to check_func
+    root.bind('<Return>', lambda event: check_func())
     draw_clock_face()
     start()
     menu()
@@ -75,10 +77,8 @@ def main():
     draw_second_hand()
     draw_minute_hand()
     draw_hour_hand()
-    print(f'{hour} : {minute} : {second}')
     users_input()
-    draw_check()
-    layout_help()
+    #layout_help()
     
 
 
@@ -184,6 +184,7 @@ def draw_second_hand():
 def start():
     start = ctk.CTkButton(
         root,
+        height=40,
         text='Start',
         font=(font[1]),
         command=start_func
@@ -198,11 +199,13 @@ def start():
 
 
 def menu():
-    menu = ctk.CTkButton(
+    menu = ctk.CTkOptionMenu(
         root,
-        text='Menu',
-        font=(font[1])
-
+        height=40,
+        font=(font[1]),
+        anchor='center',
+        values=['Light mode', 'Dark mode'],
+        command=set_theme
     )
     menu.grid(
         column=3, 
@@ -216,8 +219,10 @@ def menu():
 def quit():
     quit = ctk.CTkButton(
         root,
+        height=40,
         text='Quit',
-        font=(font[1])
+        font=(font[1]),
+        command=root.destroy
     )
     quit.grid(
         column=5, 
@@ -418,7 +423,8 @@ def start_func():
     
 
 def check_func():
-    global check_answ, STATE
+    global STATE
+    check_answ = tk.StringVar()
     user_hour = in_hour.get()
     user_min = in_minute.get()
     user_sec = in_second.get()
@@ -426,37 +432,46 @@ def check_func():
     match_m = re.fullmatch(r'(^[0]?[0-9]?|[1-5]?[0-9]?$)', user_min)
     match_s = re.fullmatch(r'(^[0]?[0-9]?|[1-5]?[0-9]?$)', user_sec)
     # Check corectness of input format
-    try:
-        if match_h and match_m and match_s:
-            if int(user_hour) == hour and int(user_min) == minute and int(user_sec) == second:
-                check_answ = 'Correct answer'
-                STATE = 1
-                clear_entry_boxes()
-            else:
-                check_answ = 'Wrong answer'
+        # User's input is blank '' '' ''
+    if user_hour == '' or user_min == '' or user_sec == '':
+        check_answ.set('Wrong input format')
+    # User's input is in corrrect format
+    elif match_h and match_m and match_s:
+        # Correct answer
+        if int(user_hour) == hour and int(user_min) == minute and int(user_sec) == second:
+            check_answ.set('Correct answer')
+            STATE = 1
+            clear_entry_boxes()
+        # Incorrect answer
         else:
-            check_answ = 'Wrong input format'
-    except:
-        check_answ = 'Wrong input format'
+            check_answ.set('Wrong answer')
+    # User's input in incorrect format eg. 'dog'
+    else:    
+        check_answ.set('Wrong input format')
 
-
-def draw_check():
-    # Set canvas for check reply
+    # Print result
     reply = ctk.CTkLabel(
         root,
-        text='',
+        text='YO',
         font=(font[2]),
-        fg_color='yellow' 
+        textvariable=check_answ
         )
     reply.grid(
-        column=2, 
+        column=1, 
         row=6,
         columnspan=4, 
         sticky=tk.NSEW, 
-        pady=HEIGHT/30, 
-        padx=(WIDTH/50, 0)
     )
-    reply.configure(text=check_answ)
+
+
+def set_theme(option):
+    '''Sets GUI mode (light / dark)'''
+    if option == 'Light mode':
+        ctk.set_appearance_mode('Light')
+        canvas.configure(background='#825C32')
+    elif option == 'Dark mode':
+        ctk.set_appearance_mode('Dark')
+        canvas.configure(background='#325882')
 
 if __name__ == '__main__':
     main()
