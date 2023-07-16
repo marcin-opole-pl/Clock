@@ -6,6 +6,8 @@ import numpy as np
 import random
 import re
 import customtkinter as ctk
+import csv
+from CTkMessagebox import CTkMessagebox
 from style import *
 
 # Set theme
@@ -22,7 +24,7 @@ ctk.set_default_color_theme("dark-blue")
 # Mask window icon
 root.iconbitmap('empty.ico')
 
-# Set dimentions for canvas to be square
+# Set dimensions for canvas to be square
 # For horizontal screen
 if root.winfo_screenwidth() > root.winfo_screenheight():
     HEIGHT = root.winfo_screenheight() - root.winfo_screenheight() / 10
@@ -33,6 +35,9 @@ elif root.winfo_screenwidth() < root.winfo_screenheight():
     HEIGHT = WIDTH
 # Set root size to screen size
 root.geometry(f'{root.winfo_screenwidth()}x{root.winfo_screenheight()}+0+0')
+# Find screen center
+width_center = root.winfo_screenwidth() / 2
+height_center = root.winfo_screenheight() / 2
 # Set canvas
 canvas = ctk.CTkCanvas(
     root, 
@@ -54,22 +59,22 @@ canvas.grid(
 in_hour = tk.StringVar()
 in_minute = tk.StringVar()
 in_second = tk.StringVar()
+users_name = tk.StringVar()
 
 # Globals
 STATE = 0
-h_list = []
-m_list = []
-s_list = []
 hour = 0
 minute = 0
 second = 0
 hour_box = ttk.Entry()
 minute_box = ttk.Entry()
 second_box = ttk.Entry()
+name_box = ttk.Entry()
 
 def main():
     # Bind enter key to check_func
     root.bind('<Return>', lambda event: check_func())
+    welcome_window()
     draw_clock_face()
     start()
     menu()
@@ -79,10 +84,10 @@ def main():
     draw_hour_hand()
     users_input()
     #layout_help()
-    
 
 
 def draw_clock_face():
+    '''Draws static clock face with central point'''
     # Draw clock face
     canvas.create_oval(
         20, 20,
@@ -120,6 +125,8 @@ def draw_clock_face():
 
     
 def draw_hour_hand():
+    '''Draws dynamic hour hand. Receives time from new_hour/new_minute/new_second functions. 
+    Drawing refreshes every 40ms.'''
     canvas.delete('hour_hand')
     hour = new_hour()
     minute = new_minute()
@@ -141,6 +148,8 @@ def draw_hour_hand():
 
 
 def draw_minute_hand():
+    '''Draws dynamic minute hand. Receives time from new_minute/new_second functions. 
+    Drawing refreshes every 40ms.'''
     canvas.delete('minute_hand')
     minute = new_minute()
     second = new_second()
@@ -161,6 +170,9 @@ def draw_minute_hand():
 
 
 def draw_second_hand():
+    '''Draws dynamic second hand. Receives time from new_second function. 
+    Drawing refreshes every 200ms.'''
+
     canvas.delete('second_hand')
     global STATE
     second = new_second()
@@ -182,6 +194,7 @@ def draw_second_hand():
 
 
 def start():
+    '''Start button, which controls start_func.'''
     start = ctk.CTkButton(
         root,
         height=40,
@@ -199,6 +212,7 @@ def start():
 
 
 def menu():
+    '''Menu button, which controls light/dark mode. Controls set_theme function'''
     menu = ctk.CTkOptionMenu(
         root,
         height=40,
@@ -217,6 +231,7 @@ def menu():
 
 
 def quit():
+    ''' Quit button. Kills window.'''
     quit = ctk.CTkButton(
         root,
         height=40,
@@ -234,6 +249,8 @@ def quit():
 
 
 def users_input():
+    ''' Draws all the labels and entry boxes for user's input. 
+    Also draws submit button, which controls check_func.'''
     global hour_box, minute_box, second_box
     ttk.Separator(root, orient='horizontal').grid(column=1, row=1, columnspan=6, sticky=tk.EW)
     label = ctk.CTkLabel(
@@ -358,12 +375,15 @@ def users_input():
 
 
 def clear_entry_boxes():
-        hour_box.delete(0, 'end')
-        minute_box.delete(0, 'end')
-        second_box.delete(0, 'end')
+    '''Clears entry boxes, when called'''
+    hour_box.delete(0, 'end')
+    minute_box.delete(0, 'end')
+    second_box.delete(0, 'end')
 
 
-def new_hour():
+def new_hour()->int:
+    '''Generates random hour, when called.
+    Returns hour.'''
     global STATE, hour
     if STATE == 0:
         hour = 0
@@ -373,7 +393,10 @@ def new_hour():
     return hour
 
 
-def new_minute():
+def new_minute()->int:
+    '''Generates random minute, when called.
+    Returns minute.'''
+
     global STATE, minute
     if STATE == 0:
         minute = 0
@@ -383,17 +406,22 @@ def new_minute():
     return minute
 
 
-def new_second():
+def new_second()->int:
+    '''Generates random hour, when called.
+    Returns hour.'''
     global STATE, second
     if STATE == 0:
         second = 0
     # Get random second
     elif STATE == 1:
+        time.sleep(0.500)
         second = random.randint(0, 59)
     return second
     
 
 def layout_help():
+    '''Disabled function.
+    When enabled, helps with window layout.'''
     ROW = 1
     ttk.Label(background='red').grid(column=0, row=ROW, sticky=tk.EW)
     ttk.Label(background='blue').grid(column=1, row=ROW, sticky=tk.EW)
@@ -416,13 +444,20 @@ def layout_help():
     ttk.Label(background='green').grid(column=6, row=11, sticky=tk.EW)
 
 
-def start_func():
+def start_func()->int:
+    '''Activated by start button. Changes STATE to 1, which activates
+    new time functions.'''
     global STATE
     STATE = 1
     return STATE
     
 
 def check_func():
+    '''Called by submit button. Checks correctness of user input. Validates input format.
+    If answer is correct, changes STATE to 1, to activate new time functions.
+    Also draws answer label.
+    Also prints time into console'''
+    print(f'{hour} : {minute} : {second}')
     global STATE
     check_answ = tk.StringVar()
     user_hour = in_hour.get()
@@ -431,11 +466,11 @@ def check_func():
     match_h = re.fullmatch(r'(^[0]?[0-9]?|[1]?[0-2]?$)', user_hour)
     match_m = re.fullmatch(r'(^[0]?[0-9]?|[1-5]?[0-9]?$)', user_min)
     match_s = re.fullmatch(r'(^[0]?[0-9]?|[1-5]?[0-9]?$)', user_sec)
-    # Check corectness of input format
+    # Check correctness of input format
         # User's input is blank '' '' ''
     if user_hour == '' or user_min == '' or user_sec == '':
         check_answ.set('Wrong input format')
-    # User's input is in corrrect format
+    # User's input is in correct format
     elif match_h and match_m and match_s:
         # Correct answer
         if int(user_hour) == hour and int(user_min) == minute and int(user_sec) == second:
@@ -465,13 +500,88 @@ def check_func():
 
 
 def set_theme(option):
-    '''Sets GUI mode (light / dark)'''
+    '''Sets GUI mode (light / dark).
+    Controlled by menu button'''
     if option == 'Light mode':
         ctk.set_appearance_mode('Light')
-        canvas.configure(background='#825C32')
+        canvas.configure(background='#CECECE')
     elif option == 'Dark mode':
         ctk.set_appearance_mode('Dark')
         canvas.configure(background='#325882')
+
+
+def welcome_window():
+    '''Creates welcome popup window for user to sign in'''
+    popup = ctk.CTkToplevel()
+    popup.attributes('-topmost', True)
+    popup.title('Welcome')
+    popup.geometry('300x200+%d+%d'% (width_center-150, height_center-100))
+    popup.iconbitmap('empty.ico')
+    # Opens csv file
+    with open('users.csv') as file:
+        reader = csv.reader(file)
+        i = 0
+        for row in reader:
+            i += 1
+    # If no users in csv creates entry form
+    if i == 1:
+        label = ctk.CTkLabel(
+            popup,
+            text='What is your name?',
+            font=(font[1]),
+            anchor=tk.CENTER
+            )
+        label.pack(pady=10)
+        name_box = ctk.CTkEntry(
+            popup,
+            font=(font[2]),
+            justify='center',
+            width=150,
+            textvariable=users_name        
+            )
+        name_box.focus()
+        name_box.pack(pady=10)
+        submit = ctk.CTkButton(
+            popup,
+            text='Create new user',
+            font=(font[1]),
+            command=add_user_func 
+            )
+        submit.pack(pady=10)
+    # If already some users are in csv welcome user
+    else:
+        with open('users.csv') as file:
+            reader = csv.DictReader(file)
+            names = []
+            for row in reader:
+                names.append(row['name'])
+                name = names[0]
+        label = ctk.CTkLabel(
+            popup,
+            text=f'Hello {name}',
+            font=(font[1]),
+            anchor=tk.CENTER
+            )
+        label.pack(pady=10)
+
+
+def add_user_func():
+    ''' Checks if user's name is valid and adds new user to csv'''
+    # If user's name longer then 10 digits
+    if len(users_name.get()) > 0:
+        CTkMessagebox(
+            title="Error",
+            message="User name no longer then 10 letters",
+            icon="cancel"
+            )
+        name_box.delete(0, 'end')
+        name_box.focus()
+    else:
+        '''Adds new player to users.csv'''
+        with open('users.csv', 'a') as file:
+            writer = csv.DictWriter(file, fieldnames=['name', 'score', 'level'])
+            writer.writerow({'name': users_name.get(), 'score': '0', 'level': '0'})
+
 
 if __name__ == '__main__':
     main()

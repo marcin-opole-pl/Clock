@@ -1,6 +1,6 @@
 
 
-# Set dimentions
+# Set dimensions
 HEIGHT = 600
 WIDTH = 1000
 canvas_height = int(0.9 * HEIGHT)
