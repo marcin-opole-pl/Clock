@@ -7,7 +7,6 @@ import random
 import re
 import customtkinter as ctk
 import csv
-from CTkMessagebox import CTkMessagebox
 from style import *
 
 # Set theme
@@ -74,7 +73,6 @@ name_box = ttk.Entry()
 def main():
     # Bind enter key to check_func
     root.bind('<Return>', lambda event: check_func())
-    welcome_window()
     draw_clock_face()
     start()
     menu()
@@ -508,79 +506,6 @@ def set_theme(option):
     elif option == 'Dark mode':
         ctk.set_appearance_mode('Dark')
         canvas.configure(background='#325882')
-
-
-def welcome_window():
-    '''Creates welcome popup window for user to sign in'''
-    popup = ctk.CTkToplevel()
-    popup.attributes('-topmost', True)
-    popup.title('Welcome')
-    popup.geometry('300x200+%d+%d'% (width_center-150, height_center-100))
-    popup.iconbitmap('empty.ico')
-    # Opens csv file
-    with open('users.csv') as file:
-        reader = csv.reader(file)
-        i = 0
-        for row in reader:
-            i += 1
-    # If no users in csv creates entry form
-    if i == 1:
-        label = ctk.CTkLabel(
-            popup,
-            text='What is your name?',
-            font=(font[1]),
-            anchor=tk.CENTER
-            )
-        label.pack(pady=10)
-        name_box = ctk.CTkEntry(
-            popup,
-            font=(font[2]),
-            justify='center',
-            width=150,
-            textvariable=users_name        
-            )
-        name_box.focus()
-        name_box.pack(pady=10)
-        submit = ctk.CTkButton(
-            popup,
-            text='Create new user',
-            font=(font[1]),
-            command=add_user_func 
-            )
-        submit.pack(pady=10)
-    # If already some users are in csv welcome user
-    else:
-        with open('users.csv') as file:
-            reader = csv.DictReader(file)
-            names = []
-            for row in reader:
-                names.append(row['name'])
-                name = names[0]
-        label = ctk.CTkLabel(
-            popup,
-            text=f'Hello {name}',
-            font=(font[1]),
-            anchor=tk.CENTER
-            )
-        label.pack(pady=10)
-
-
-def add_user_func():
-    ''' Checks if user's name is valid and adds new user to csv'''
-    # If user's name longer then 10 digits
-    if len(users_name.get()) > 0:
-        CTkMessagebox(
-            title="Error",
-            message="User name no longer then 10 letters",
-            icon="cancel"
-            )
-        name_box.delete(0, 'end')
-        name_box.focus()
-    else:
-        '''Adds new player to users.csv'''
-        with open('users.csv', 'a') as file:
-            writer = csv.DictWriter(file, fieldnames=['name', 'score', 'level'])
-            writer.writerow({'name': users_name.get(), 'score': '0', 'level': '0'})
 
 
 if __name__ == '__main__':
