@@ -1,5 +1,7 @@
 
-# Clock
+# Clock  
+
+***program that tests your clock reading skills***
 
 ## Main file to run program is project.py
 
