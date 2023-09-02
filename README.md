@@ -1,5 +1,5 @@
 
-# Clock  
+# Clock - this program was submitted as a final project for Harvard's CS50P
 
 ***program that tests your clock reading skills***
 
